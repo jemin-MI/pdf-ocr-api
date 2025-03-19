@@ -1,0 +1,4 @@
+fastapi
+PyMuPDF
+google-cloud-documentai
+python-multipart
