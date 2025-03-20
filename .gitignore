@@ -174,3 +174,5 @@ cython_debug/
 .pypirc
 google_private
 uploads
+groq_data
+saved_summary

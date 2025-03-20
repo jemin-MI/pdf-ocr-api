@@ -2,10 +2,11 @@ from fastapi import HTTPException
 from pathlib import Path
 from src.utils.google_ocr import GoogleDocAI
 from src.utils.grok_api import GroqAPI
-from src.utils.helper import  get_text_from_file, save_text_file
+from src.utils.helper import get_text_from_file, save_text_file, extract_json_from_text
 
 UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
+
 
 class FileService:
     @staticmethod
@@ -14,17 +15,15 @@ class FileService:
             raise HTTPException(status_code=400, detail="Only PDF files are allowed.")
 
         if file:
-
             google_doc = GoogleDocAI()
             summary_text = google_doc.get_summary_using_google(file)
 
-            save_text_file('groq_data', str(summary_text))
+            save_text_file('saved_summary/google_data', str(summary_text))
 
             print("The document contains the following text:-----------------------")
             print(summary_text)
 
             return {"filename": file.filename, "Summary": summary_text}
-
 
     @staticmethod
     def process_groq(file):
@@ -35,7 +34,7 @@ class FileService:
         groq = GroqAPI()
         summary_text = groq.get_summary_using_groq(text)
 
-        save_text_file('groq_data', summary_text)
+        save_text_file('saved_summary/google_data', summary_text)
 
         print("The document contains the following text:-----------------------")
         print(summary_text)
@@ -49,14 +48,15 @@ class NutrientFinder:
     def meal_planner(summary):
         if summary:
             groq = GroqAPI()
-            result = groq.get_meal_plan(summary, user_data = None )
-            return {"Nutrient": result}
+            result = groq.get_meal_plan(summary, user_data=None)
+            json_text = extract_json_from_text(result)
+            return {"Result": json_text}
 
     @staticmethod
     def nutrient_finder(summary):
         if summary:
             groq = GroqAPI()
-            result = groq.get_nutrient(summary )
+            result = groq.get_nutrient(summary)
             return {"Nutrient": result}
 
     @staticmethod
@@ -70,6 +70,3 @@ class NutrientFinder:
             meal_plan = NutrientFinder.meal_planner(str(nutrient_value))
 
             return {'Meal Plan': meal_plan}
-
-
-

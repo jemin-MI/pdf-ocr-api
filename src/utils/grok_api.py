@@ -2,12 +2,13 @@ import os
 
 from groq import Groq
 
+
 class GroqAPI:
 
     def __init__(self):
         self.client = Groq(api_key=os.getenv('GROQ_API_KEY'))
 
-    def get_summary_using_groq(self, text: str,) -> str:
+    def get_summary_using_groq(self, text: str, ) -> str:
         try:
             if not text or len(text.strip()) < 10:
                 return "Insufficient text for meaningful analysis."
@@ -78,7 +79,7 @@ class GroqAPI:
             # logging.error(f"Error in AI summarization: {e}")
             return f"Error in AI analysis: {str(e)}"
 
-    def get_meal_plan(self, nutrient_summary, user_data = None ):
+    def get_meal_plan(self, nutrient_summary, user_data=None):
         try:
             if not nutrient_summary or len(nutrient_summary.strip()) < 10:
                 return "Insufficient text for meaningful analysis."
@@ -88,7 +89,7 @@ class GroqAPI:
             You are an experienced Nutrition Practitioner.  
             Analyze the following nutrient report and user profile details.  
 
-            Based on the provided data, create a personalized **meal plan** and suggest **recipes** that align with the user's fitness goals, dietary preferences, and activity level.  
+            Based on the provided data, create a personalized **meal plan** and suggest **recipes** that align with the user's fitness goals, dietary preferences, and activity level in JSON or dictionary format
 
             **User Profile**  
             - **Age:** 40  
@@ -104,10 +105,26 @@ class GroqAPI:
             - **Plan Duration:** 3 Days  
             - **User ID:** 67d7c7011199f5701555a21e  
 
-            **Nutrient Report Summary**  
-            {nutrient_summary}  
-
-            Ensure meals align with the user's **fitness goal** and **dietary preferences**.  
+            Nutrient Report Summary: {nutrient_summary}   
+            **Response Format Example:**  
+            ```json
+            {{
+                "day1": [
+                    {{
+                        "meal": "Breakfast",
+                        "food": "Oatmeal with almond milk, banana, and walnuts",
+                        "calories": 400,
+                        "macronutrients": {{
+                            "protein": "20g",
+                            "carbohydrates": "60g",
+                            "fat": "15g"
+                        }}
+                    }},
+                    ...
+                ]
+            }}
+            ```  
+            Ensure meals align with the user's **fitness goal** and **dietary preferences**.
             """
 
             # Generate summary
@@ -119,7 +136,7 @@ class GroqAPI:
                     },
                     {
                         "role": "user",
-                        "content": "Summary: "
+                        "content": "Provide the meal plan in JSON format only."
                     }
                 ],
                 model="llama3-8b-8192",
